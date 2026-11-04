@@ -1,0 +1,22 @@
+[workspace]
+members = ["wincode", "wincode-derive"]
+exclude = ["fuzz"]
+resolver = "2"
+
+[workspace.lints.clippy]
+default_trait_access = "deny"
+manual_let_else = "deny"
+used_underscore_binding = "deny"
+arithmetic_side_effects = "deny"
+
+[workspace.package]
+authors = ["Anza Maintainers <maintainers@anza.xyz>"]
+repository = "https://github.com/anza-xyz/wincode"
+homepage = "https://anza.xyz/"
+license = "Apache-2.0"
+edition = "2024"
+rust-version = "1.89.0"
+
+[workspace.dependencies]
+quote = "1.0.45"
+proc-macro2 = "1.0.106"

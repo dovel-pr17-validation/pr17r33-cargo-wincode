@@ -1,0 +1,51 @@
+[package]
+name = "wincode-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+bincode_1 = { package = "bincode", version = "1.3" }
+bincode_2 = { package = "bincode", version = "2.0", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+libfuzzer-sys = "0.4"
+uuid = { version = "1.20.0", features = ["serde"] }
+wincode = { path = "../wincode", features = ["uuid-serde-compat", "std", "alloc"] }
+wincode-derive = { path = "../wincode-derive" }
+
+solana-address = { version = "2.7.0", features = ["wincode"] }
+solana-hash = { version = "4.6.0", features = ["wincode"] }
+solana-fee-calculator = { version = "3.3.0", features = ["wincode"] }
+solana-message = { version = "5.0.0", features = ["wincode"] }
+solana-nonce = { version = "3.3.0", features = ["wincode"] }
+solana-signature = { version = "3.5.2", features = ["wincode"] }
+solana-transaction = { version = "5.0.0", features = ["wincode"] }
+solana-entry = { version = "4.4.0-beta.1", features = ["agave-unstable-api"] }
+agave-votor-messages = { version = "4.4.0-beta.1", features = ["agave-unstable-api"] }
+
+[build-dependencies]
+wincode = { path = "../wincode", features = ["uuid-serde-compat"] }
+wincode-derive = { path = "../wincode-derive" }
+serde = { version = "1.0", features = ["derive"] }
+uuid = { version = "1.20.0", features = ["serde"] }
+
+[[bin]]
+name = "roundtrip"
+path = "fuzz_targets/roundtrip.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "solana_types"
+path = "fuzz_targets/solana_types.rs"
+test = false
+doc = false
+bench = false
+
+[patch.crates-io]
+wincode = { path = "../wincode" }
+wincode-derive = { path = "../wincode-derive" }

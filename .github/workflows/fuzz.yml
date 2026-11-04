@@ -1,0 +1,53 @@
+name: Dispatch continuous fuzzing
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  # Override .cargo/config.toml so cached builds are portable across runner CPUs.
+  RUSTFLAGS: ""
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    environment: fuzz
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
+        with:
+          toolchain: nightly
+          rustflags: ""
+
+      - uses: dtolnay/install@d0dc46e85ffd2c174b5ac0489e17f95dae84fa5a # cargo-fuzz
+      - run: cargo +nightly fuzz build --no-trace-compares
+
+      - name: Prepare bundle
+        run: ./fuzz/build-fuzz-bundle.sh
+
+      - name: Upload corpus to FuzzCorp
+        uses: asymmetric-research/fuzz-upload-action@d81375ddc1887ddf574713845dcfada9d3968edc # v2.1.0
+        with:
+          upload_type: corpus
+          upload_path: ./fuzz/corpus/roundtrip
+          upload_args: --lineage roundtrip --kind seed
+        env:
+          FUZZ_ORGANIZATION: anza
+          FUZZ_PROJECT: wincode
+          FUZZ_API_KEY: ${{ secrets.FUZZ_API_KEY }}
+
+      - name: Upload bundle to FuzzCorp
+        uses: asymmetric-research/fuzz-upload-action@d81375ddc1887ddf574713845dcfada9d3968edc # v2.1.0
+        with:
+          upload_type: bundle
+          upload_path: ./fuzz/target/bundle
+        env:
+          FUZZ_ORGANIZATION: anza
+          FUZZ_PROJECT: wincode
+          FUZZ_API_KEY: ${{ secrets.FUZZ_API_KEY }}
